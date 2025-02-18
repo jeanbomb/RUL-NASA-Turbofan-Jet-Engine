@@ -1,7 +1,7 @@
 # Predictive Maintenance API (RUL Prediction)
 
 ## 📌 專案簡介
-本專案針對工業設備的預測性維護（Predictive Maintenance），利用機器學習與深度學習技術來預測設備的剩餘使用壽命（RUL）。我們使用 XGBoost、隨機森林（Random Forest）、卷積神經網絡（CNN） 進行模型訓練，最終 XGBoost 表現最佳。
+本專案針對工業設備的預測性維護（Predictive Maintenance），利用機器學習與深度學習技術來預測設備的剩餘使用壽命（RUL）。使用 XGBoost、隨機森林（Random Forest）、卷積神經網絡（CNN） 進行模型訓練，最終 XGBoost 表現最佳。
 
 ## 📂 數據集
 - NASA CMaps (https://www.kaggle.com/datasets/behrad3d/nasa-cmaps)
