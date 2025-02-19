@@ -2,7 +2,7 @@ from fastapi import FastAPI
 import joblib
 import numpy as np
 from pydantic import BaseModel
-from typing import List  # 修正 Optional 錯誤
+from typing import List
 
 # 初始化 FastAPI 應用
 app = FastAPI()
@@ -12,7 +12,7 @@ try:
     model = joblib.load("xgboost_rul_model.pkl")
     print("✅ XGBoost 模型已成功載入")
 except Exception as e:
-    model = None  # 如果模型載入失敗，設為 None，避免後續錯誤
+    model = None
     print(f"❌ 無法載入模型: {e}")
 
 # 定義輸入數據格式
@@ -26,21 +26,15 @@ async def root():
 
 @app.post("/predict/")
 async def predict_rul(data: RULInput):
-    # 確保模型已經成功載入
     if model is None:
         return {"error": "模型未載入，請檢查模型檔案是否存在"}
 
-    # 檢查輸入特徵數量是否正確
     if len(data.features) != 38:
         return {"error": "輸入特徵數量錯誤，應該是 38 個數值"}
     
     try:
-        # 轉換輸入數據為 numpy 陣列
         input_data = np.array(data.features).reshape(1, -1)
-        
-        # 進行預測
         prediction = model.predict(input_data)[0]
-        
         return {"predicted_RUL": float(prediction)}
     except Exception as e:
         return {"error": str(e)}
