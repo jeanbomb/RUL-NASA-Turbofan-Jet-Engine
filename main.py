@@ -2,33 +2,47 @@ from fastapi import FastAPI
 import joblib
 import numpy as np
 from pydantic import BaseModel
+from typing import Optional
 
-# ªì©l¤Æ FastAPI À³¥Î
+# åˆå§‹åŒ– FastAPI æ‡‰ç”¨
 app = FastAPI()
 
-# ¸ü¤J¤w°V½m¦nªº XGBoost ¼Ò«¬
+# è¼‰å…¥å·²è¨“ç·´å¥½çš„ XGBoost æ¨¡å‹
+model = None  # é è¨­ç‚º Noneï¼Œé˜²æ­¢æ¨¡å‹åŠ è¼‰å¤±æ•—å°è‡´ç¨‹å¼å´©æ½°
 try:
     model = joblib.load("xgboost_rul_model.pkl")
-    print("? XGBoost ¼Ò«¬¤w¦¨¥\¸ü¤J")
+    print("âœ… XGBoost æ¨¡å‹å·²æˆåŠŸè¼‰å…¥")
 except Exception as e:
-    print(f"? µLªk¸ü¤J¼Ò«¬: {e}")
+    print(f"âŒ ç„¡æ³•è¼‰å…¥æ¨¡å‹: {e}")
 
-# ©w¸q¿é¤J¼Æ¾Ú®æ¦¡
+# å®šç¾©è¼¸å…¥æ•¸æ“šæ ¼å¼
 class RULInput(BaseModel):
-    features: list[float]  # ¿é¤J¯S¼x¼Æ¾Ú¡]»P°V½m®Éªº®æ¦¡¤@­P¡^
+    features: list[float]  # è¼¸å…¥ç‰¹å¾µæ•¸æ“šï¼ˆèˆ‡è¨“ç·´æ™‚çš„æ ¼å¼ä¸€è‡´ï¼‰
 
-# ©w¸q API ¸ô¥Ñ
+# å®šç¾© API è·¯ç”±
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int, q: Optional[str] = None):
+    return {"item_id": item_id, "q": q}
+
 @app.post("/predict/")
 async def predict_rul(data: RULInput):
     try:
-        # ÀË¬d¿é¤J¼Æ¾Úªø«×
+        # ç¢ºä¿æ¨¡å‹å·²åŠ è¼‰
+        if model is None:
+            return {"error": "æ¨¡å‹æœªè¼‰å…¥ï¼Œè«‹æª¢æŸ¥æ¨¡å‹æª”æ¡ˆæ˜¯å¦å­˜åœ¨"}
+
+        # æª¢æŸ¥è¼¸å…¥æ•¸æ“šé•·åº¦
         if len(data.features) != 38:
-            return {"error": "¿é¤J¯S¼x¼Æ¶q¿ù»~¡AÀ³¸Ó¬O 38 ­Ó¼Æ­È"}
+            return {"error": "è¼¸å…¥ç‰¹å¾µæ•¸é‡éŒ¯èª¤ï¼Œæ‡‰è©²æ˜¯ 38 å€‹æ•¸å€¼"}
             
-        # Âà´«¿é¤J¼Æ¾Ú¬° numpy °}¦C
+        # è½‰æ›è¼¸å…¥æ•¸æ“šç‚º numpy é™£åˆ—
         input_data = np.array(data.features).reshape(1, -1)
         
-        # ¶i¦æ¹w´ú
+        # é€²è¡Œé æ¸¬
         prediction = model.predict(input_data)[0]
         
         return {"predicted_RUL": prediction}
