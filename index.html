@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUL 預測系統</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        input { width: 50px; margin: 5px; }
+        .input-container { display: flex; flex-wrap: wrap; justify-content: center; }
+        button { margin-top: 10px; padding: 10px 15px; font-size: 16px; cursor: pointer; }
+        #result { margin-top: 20px; font-size: 18px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>RUL 預測系統</h2>
+    <p>請輸入 38 個特徵數值：</p>
+    <div class="input-container" id="inputContainer"></div>
+    <button onclick="predictRUL()">預測 RUL</button>
+    <p id="result"></p>
+
+    <script>
+        // 自動生成 38 個輸入框
+        const inputContainer = document.getElementById("inputContainer");
+        for (let i = 0; i < 38; i++) {
+            let input = document.createElement("input");
+            input.type = "number";
+            input.placeholder = i + 1;
+            inputContainer.appendChild(input);
+        }
+
+        async function predictRUL() {
+            let inputs = document.querySelectorAll("input");
+            let features = Array.from(inputs).map(input => parseFloat(input.value) || 0);  // 預設 0
+
+            if (features.length !== 38) {
+                alert("請輸入 38 個特徵數值！");
+                return;
+            }
+
+            let response = await fetch("https://rul-nasa-turbofan-jet-engine.onrender.com/predict/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ features: features })
+            });
+
+            let result = await response.json();
+            document.getElementById("result").innerText = `預測的 RUL: ${result.predicted_RUL || "發生錯誤"}`;
+        }
+    </script>
+</body>
+</html>
