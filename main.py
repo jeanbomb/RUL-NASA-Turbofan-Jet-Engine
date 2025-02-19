@@ -2,49 +2,45 @@ from fastapi import FastAPI
 import joblib
 import numpy as np
 from pydantic import BaseModel
-from typing import Optional
+from typing import List  # 修正 Optional 錯誤
 
 # 初始化 FastAPI 應用
 app = FastAPI()
 
-# 載入已訓練好的 XGBoost 模型
-model = None  # 預設為 None，防止模型加載失敗導致程式崩潰
+# 嘗試載入已訓練好的 XGBoost 模型
 try:
     model = joblib.load("xgboost_rul_model.pkl")
     print("✅ XGBoost 模型已成功載入")
 except Exception as e:
+    model = None  # 如果模型載入失敗，設為 None，避免後續錯誤
     print(f"❌ 無法載入模型: {e}")
 
 # 定義輸入數據格式
 class RULInput(BaseModel):
-    features: list[float]  # 輸入特徵數據（與訓練時的格式一致）
+    features: List[float]  # 確保輸入是數值列表
 
 # 定義 API 路由
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, "q": q}
+    return {"message": "API 部署成功！請使用 /predict/ 來進行預測"}
 
 @app.post("/predict/")
 async def predict_rul(data: RULInput):
-    try:
-        # 確保模型已加載
-        if model is None:
-            return {"error": "模型未載入，請檢查模型檔案是否存在"}
+    # 確保模型已經成功載入
+    if model is None:
+        return {"error": "模型未載入，請檢查模型檔案是否存在"}
 
-        # 檢查輸入數據長度
-        if len(data.features) != 38:
-            return {"error": "輸入特徵數量錯誤，應該是 38 個數值"}
-            
+    # 檢查輸入特徵數量是否正確
+    if len(data.features) != 38:
+        return {"error": "輸入特徵數量錯誤，應該是 38 個數值"}
+    
+    try:
         # 轉換輸入數據為 numpy 陣列
         input_data = np.array(data.features).reshape(1, -1)
         
         # 進行預測
         prediction = model.predict(input_data)[0]
         
-        return {"predicted_RUL": prediction}
+        return {"predicted_RUL": float(prediction)}
     except Exception as e:
         return {"error": str(e)}
