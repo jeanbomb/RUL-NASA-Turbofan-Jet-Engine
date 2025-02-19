@@ -3,6 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 import joblib
 import numpy as np
 from pydantic import BaseModel
+import os
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 10000)))  # 預設 10000，但 Render 會改成它的 PORT
+
 
 app = FastAPI()
 
