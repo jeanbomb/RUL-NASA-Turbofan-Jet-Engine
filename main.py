@@ -15,7 +15,7 @@ app = FastAPI()
 # 🔥 啟用 CORS，允許前端請求 API 🔥
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://rul-nasa-turbofan-jet-engine-1.onrender.com"],  # 允許前端網址
+    allow_origins=["*"],  # 允許所有網址
     allow_credentials=True,
     allow_methods=["*"],  # 允許所有 HTTP 方法
     allow_headers=["*"],  # 允許所有請求標頭
