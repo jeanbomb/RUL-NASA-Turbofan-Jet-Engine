@@ -5,17 +5,12 @@ import numpy as np
 from pydantic import BaseModel
 import os
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 10000)))  # 預設 10000，但 Render 會改成它的 PORT
-
-
 app = FastAPI()
 
 # 🔥 啟用 CORS，允許前端請求 API 🔥
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 允許所有網址
+    allow_origins=["*"],  # 允許所有網址（正式環境請改成指定網域）
     allow_credentials=True,
     allow_methods=["*"],  # 允許所有 HTTP 方法
     allow_headers=["*"],  # 允許所有請求標頭
@@ -47,3 +42,7 @@ async def predict_rul(data: RULInput):
         return {"predicted_RUL": prediction}
     except Exception as e:
         return {"error": str(e)}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 10000)))  # 預設 10000，但 Render 會改成它的 PORT
