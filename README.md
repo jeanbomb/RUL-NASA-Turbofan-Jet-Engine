@@ -1,9 +1,10 @@
 # Predictive Maintenance API (RUL Prediction)  
-[日本語 | 中文版]
+
+[日本語](#日本語) | [中文](#中文)
 
 ---
 
-## 日本語
+## <a name="日本語"></a>日本語
 
 [↑ 頁首へ](#predictive-maintenance-api-rul-prediction)
 
@@ -53,7 +54,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 
 ---
 
-## 中文版
+## <a name="中文"></a>中文版
 
 [↑ 回到頁首](#predictive-maintenance-api-rul-prediction)
 
